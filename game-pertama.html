@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Tarik Tambang Matematika - Bilangan Berpangkat</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+  body {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    min-height: 100vh;
+    color: #fff;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+  .container { max-width: 1000px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 2.2em;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+  }
+  .subtitle {
+    text-align: center;
+    margin-bottom: 20px;
+    opacity: 0.9;
+    font-size: 1.1em;
+  }
+  .arena {
+    background: linear-gradient(to bottom, #87CEEB 0%, #87CEEB 60%, #8B4513 60%, #8B4513 100%);
+    border-radius: 20px;
+    padding: 30px 20px;
+    position: relative;
+    height: 280px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    overflow: hidden;
+  }
+  .ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    background: linear-gradient(to bottom, #8B4513, #654321);
+  }
+  .center-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 60%;
+    background: rgba(255,255,255,0.3);
+    border-left: 2px dashed rgba(255,255,255,0.5);
+    border-right: 2px dashed rgba(255,255,255,0.5);
+  }
+  .team {
+    position: absolute;
+    top: 30px;
+    text-align: center;
+    width: 120px;
+    z-index: 2;
+  }
+  .team-left { left: 20px; }
+  .team-right { right: 20px; }
+  .team-icon {
+    font-size: 3.5em;
+    margin-bottom: 5px;
+    transition: transform 0.3s;
+  }
+  .team-name {
+    font-weight: bold;
+    font-size: 1.1em;
+    background: rgba(0,0,0,0.4);
+    padding: 4px 10px;
+    border-radius: 10px;
+  }
+  .rope-container {
+    position: absolute;
+    top: 55%;
+    left: 5%;
+    right: 5%;
+    height: 10px;
+    background: #d4a574;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .rope-marker {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, #ff4444, #cc0000);
+    border: 3px solid #fff;
+    border-radius: 50%;
+    transition: left 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 15px rgba(255,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+  .question-box {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 20px;
+    border: 2px solid rgba(255,255,255,0.2);
+  }
+  .question-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+  }
+  .question-text {
+    font-size: 1.5em;
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+  }
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 15px;
+  }
+  .option-btn {
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+  }
+  .option-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+  .option-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+  .option-btn.correct { background: linear-gradient(135deg, #11998e, #38ef7d); }
+  .option-btn.wrong { background: linear-gradient(135deg, #eb3349, #f45c43); }
+  .feedback {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 1.2em;
+    min-height: 30px;
+    font-weight: bold;
+  }
+  .feedback.correct { color: #38ef7d; }
+  .feedback.wrong { color: #f45c43; }
+  .score-board {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    background: rgba(0,0,0,0.3);
+    padding: 10px;
+    border-radius: 10px;
+  }
+  .score-item { text-align: center; }
+  .score-label { font-size: 0.9em; opacity: 0.8; }
+  .score-value { font-size: 1.5em; font-weight: bold; }
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal.active { display: flex; }
+  .modal-content {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 500px;
+    animation: popIn 0.5s;
+  }
+  @keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .modal-content h2 { font-size: 2.5em; margin-bottom: 15px; }
+  .modal-content p { font-size: 1.2em; margin-bottom: 20px; }
+  .btn-restart {
+    padding: 12px 30px;
+    background: #fff;
+    color: #764ba2;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .btn-restart:hover { transform: scale(1.05); }
+  .shake { animation: shake 0.5s; }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+  }
+  .pull-left { animation: pullLeft 0.5s; }
+  .pull-right { animation: pullRight 0.5s; }
+  @keyframes pullLeft {
+    0%,100% { transform: translateX(0); }
+    50% { transform: translateX(-20px); }
+  }
+  @keyframes pullRight {
+    0%,100% { transform: translateX(0); }
+    50% { transform: translateX(20px); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🏆 TARIK TAMBANG MATEMATIKA 🏆</h1>
+  <p class="subtitle">Bilangan Berpangkat - SMK Kelas 10</p>
+
+  <div class="arena">
+    <div class="ground"></div>
+    <div class="center-line"></div>
+    <div class="team team-left">
+      <div class="team-icon" id="iconLeft">🧑‍🎓</div>
+      <div class="team-name">SISWA</div>
+    </div>
+    <div class="team team-right">
+      <div class="team-icon" id="iconRight">🤖</div>
+      <div class="team-name">KOMPUTER</div>
+    </div>
+    <div class="rope-container">
+      <div class="rope-marker" id="ropeMarker">VS</div>
+    </div>
+  </div>
+
+  <div class="question-box">
+    <div class="question-header">
+      <span>Soal: <strong id="qNumber">1</strong> / 5</span>
+      <span>Posisi Tali: <strong id="ropePos">0</strong></span>
+    </div>
+    <div class="question-text" id="questionText">Memuat soal...</div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="score-board">
+      <div class="score-item">
+        <div class="score-label">✅ Benar (Siswa)</div>
+        <div class="score-value" id="correctScore">0</div>
+      </div>
+      <div class="score-item">
+        <div class="score-label">❌ Salah (Komputer)</div>
+        <div class="score-value" id="wrongScore">0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="resultModal">
+  <div class="modal-content">
+    <h2 id="resultTitle">🎉</h2>
+    <p id="resultMessage"></p>
+    <button class="btn-restart" onclick="restartGame()">🔄 Main Lagi</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "Hasil dari 2³ × 2⁴ adalah ...",
+    options: ["2⁷ = 128", "2¹² = 4096", "4⁷", "4¹²"],
+    answer: 0
+  },
+  {
+    q: "Nilai dari 5⁶ ÷ 5² adalah ...",
+    options: ["5³ = 125", "5⁴ = 625", "5⁸", "1"],
+    answer: 1
+  },
+  {
+    q: "Nilai dari 3⁻² adalah ...",
+    options: ["-9", "-6", "1/9", "9"],
+    answer: 2
+  },
+  {
+    q: "Hasil dari 16^(1/2) + 27^(1/3) adalah ...",
+    options: ["5", "6", "7", "8"],
+    answer: 2
+  },
+  {
+    q: "Nilai dari (2³)² × 2⁰ adalah ...",
+    options: ["32", "64", "128", "256"],
+    answer: 1
+  }
+];
+
+let currentQ = 0;
+let ropePosition = 0; // -5 (menang siswa) s/d +5 (menang komputer)
+let correctCount = 0;
+let wrongCount = 0;
+
+function loadQuestion() {
+  if (currentQ >= questions.length) {
+    endGame();
+    return;
+  }
+  const q = questions[currentQ];
+  document.getElementById('qNumber').textContent = currentQ + 1;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback';
+
+  const optionsDiv = document.getElementById('options');
+  optionsDiv.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = String.fromCharCode(65 + i) + '. ' + opt;
+    btn.onclick = () => checkAnswer(i, btn);
+    optionsDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected, btn) {
+  const q = questions[currentQ];
+  const allBtns = document.querySelectorAll('.option-btn');
+  allBtns.forEach(b => b.disabled = true);
+
+  const feedback = document.getElementById('feedback');
+  const iconLeft = document.getElementById('iconLeft');
+  const iconRight = document.getElementById('iconRight');
+
+  if (selected === q.answer) {
+    btn.classList.add('correct');
+    feedback.textContent = '✅ BENAR! Tali bergerak ke arah SISWA!';
+    feedback.className = 'feedback correct';
+    ropePosition--;
+    correctCount++;
+    iconLeft.classList.add('pull-left');
+    setTimeout(() => iconLeft.classList.remove('pull-left'), 500);
+  } else {
+    btn.classList.add('wrong');
+    allBtns[q.answer].classList.add('correct');
+    feedback.textContent = '❌ SALAH! Tali bergerak ke arah KOMPUTER!';
+    feedback.className = 'feedback wrong';
+    ropePosition++;
+    wrongCount++;
+    iconRight.classList.add('pull-right');
+    setTimeout(() => iconRight.classList.remove('pull-right'), 500);
+  }
+
+  updateRope();
+  document.getElementById('correctScore').textContent = correctCount;
+  document.getElementById('wrongScore').textContent = wrongCount;
+
+  currentQ++;
+  setTimeout(() => {
+    if (currentQ >= questions.length) {
+      endGame();
+    } else {
+      loadQuestion();
+    }
+  }, 1800);
+}
+
+function updateRope() {
+  const marker = document.getElementById('ropeMarker');
+  // ropePosition: -5 s/d +5, mapping ke 0% s/d 100%
+  const percent = 50 + (ropePosition * 10); // setiap posisi = 10%
+  marker.style.left = percent + '%';
+  marker.textContent = ropePosition === 0 ? 'VS' : (ropePosition < 0 ? '←' : '→');
+  document.getElementById('ropePos').textContent = ropePosition;
+}
+
+function endGame() {
+  const modal = document.getElementById('resultModal');
+  const title = document.getElementById('resultTitle');
+  const msg = document.getElementById('resultMessage');
+
+  if (ropePosition === -5) {
+    title.textContent = '🎉 SISWA MENANG! 🎉';
+    msg.innerHTML = `Selamat! Kamu berhasil menjawab SEMUA soal dengan benar!<br>
+      <strong>Skor Akhir: ${correctCount} Benar - ${wrongCount} Salah</strong><br>
+      Tali sepenuhnya berada di pihakmu!`;
+  } else if (ropePosition >= 0) {
+    title.textContent = '🤖 KOMPUTER MENANG!';
+    msg.innerHTML = `Sayang sekali, komputer berhasil menarik tali ke pihaknya.<br>
+      <strong>Skor Akhir: ${correctCount} Benar - ${wrongCount} Salah</strong><br>
+      Ayo coba lagi!`;
+  } else {
+    title.textContent = '🏅 SISWA MENANG!';
+    msg.innerHTML = `Kamu berhasil memenangkan tarik tambang!<br>
+      <strong>Skor Akhir: ${correctCount} Benar - ${wrongCount} Salah</strong>`;
+  }
+  modal.classList.add('active');
+}
+
+function restartGame() {
+  currentQ = 0;
+  ropePosition = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  document.getElementById('correctScore').textContent = '0';
+  document.getElementById('wrongScore').textContent = '0';
+  document.getElementById('resultModal').classList.remove('active');
+  updateRope();
+  loadQuestion();
+}
+
+// Mulai game
+loadQuestion();
+updateRope();
+</script>
+</body>
+</html>
